@@ -17,6 +17,7 @@ services:
       - 80:80
   db:
     image: postgres:16-alpine
+    restart: on-failure
     environment:
       POSTGRES_USER: *pguser
       POSTGRES_PASSWORD: *pgpassword
