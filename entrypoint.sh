@@ -33,16 +33,23 @@ substitute(){
     sed -i 's/$webservergroup.*/$webservergroup = 'www-data';/gmi' localconfig
 }
 
+prepare_kanban(){
+    sed -i 's/https:\/\/bugzilla\.mozilla\.org/http:\/\/localhost/gmi' bzkanban/index.html
+}
+
 prepare() {
         substitute
         make_config
+        prepare_kanban
         ./checksetup.pl $TEMPORARY_CONFIG_FILE
 }
 
 run() {
     prepare
-    spawn-fcgi -s /var/run/fcgiwrap.sock -M 766 /usr/sbin/fcgiwrap
-    nginx -g 'daemon off;'
+    # spawn-fcgi -s /var/run/fcgiwrap.sock -M 766 /usr/sbin/fcgiwrap
+    # spawn-fcgi -p 9000 /usr/sbin/fcgiwrap;
+    # nginx -g 'daemon off;'
+    apachectl -D FOREGROUND
 }
 
 run

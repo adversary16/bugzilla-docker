@@ -55,17 +55,23 @@ RUN apt-get install -y \
     rst2pdf \
     git \
     bash \
-    nginx \
+    # nginx \
     fcgiwrap \
-    spawn-fcgi
+    spawn-fcgi \
+    apache2
 
 RUN rm -rf /etc/nginx/sites-enabled/*
 WORKDIR /var/www/html/bugzilla
-RUN git clone https://github.com/bugzilla/bugzilla --branch stable ./
-RUN ./checksetup.pl
+RUN git clone https://github.com/bugzilla/bugzilla --branch 5.2 ./
 RUN ./install-module.pl -all
+RUN ./checksetup.pl
 COPY ./entrypoint.sh ./
-COPY *.conf /etc/nginx/conf.d/
+# COPY *.conf /etc/nginx/conf.d/
+COPY ./00-bugzilla.apache.conf /etc/apache2/sites-available/bugzilla.conf
+RUN a2ensite bugzilla && a2enmod headers env rewrite expires cgi
+
+RUN git clone https://github.com/leif81/bzkanban --branch master ./bzkanban/
+
 RUN chmod +x ./entrypoint.sh
 # USER www-data
 ENTRYPOINT [ "./entrypoint.sh" ]
