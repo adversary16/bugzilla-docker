@@ -1,0 +1,27 @@
+x-pg-user: &pguser redmine
+x-pg-password: &pgpassword redmine
+
+version: '3.8'
+services:
+  bugzilla:
+    build: ./
+    restart: on-failure
+    environment:
+      DB_HOST: 'db'
+      DB_PORT: 5432
+      DB_TYPE: 'Pg'
+      DB_USER: *pguser
+      DB_PASSWORD: *pgpassword
+      DB_BASE: 'bugzilla'
+    ports:
+      - 80:80
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: *pguser
+      POSTGRES_PASSWORD: *pgpassword
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
